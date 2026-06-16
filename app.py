@@ -20,7 +20,7 @@ import json
 import os
 
 from flask import (
-    Flask, abort, render_template, request, send_from_directory, url_for,
+    Flask, Response, abort, render_template, request, url_for,
 )
 
 from siba import storage, submitter
@@ -32,13 +32,23 @@ app = Flask(__name__)
 
 
 def carregar_config() -> dict:
-    """Carrega config.json (ou config.example.json com aviso)."""
+    """Carrega a configuração.
+
+    Ordem de prioridade:
+      1. variável de ambiente SIBA_CONFIG_JSON (usada na cloud/Vercel);
+      2. config.json (local);
+      3. config.example.json (com aviso).
+    """
+    env_cfg = os.environ.get("SIBA_CONFIG_JSON")
+    if env_cfg:
+        return json.loads(env_cfg)
+
     cfg_path = os.path.join(BASE, "config.json")
     if not os.path.exists(cfg_path):
         cfg_path = os.path.join(BASE, "config.example.json")
         app.logger.warning(
             "config.json não encontrado — a usar config.example.json. "
-            "Crie config.json com os dados reais do estabelecimento."
+            "Defina SIBA_CONFIG_JSON ou crie config.json com os dados reais."
         )
     with open(cfg_path, encoding="utf-8") as f:
         return json.load(f)
@@ -97,10 +107,9 @@ def submeter():
     ws = cfg.get("webservice", {})
 
     nome_xml = request.form.get("nome_xml", "")
-    caminho = os.path.join(storage.DIR_XML, nome_xml)
-    if not nome_xml or not os.path.exists(caminho):
+    xml = storage.obter_xml(nome_xml) if nome_xml else None
+    if xml is None:
         abort(404)
-    xml = open(caminho, encoding="utf-8").read()
 
     resultado = submitter.submeter(
         xml,
@@ -125,12 +134,26 @@ def submeter():
 
 @app.route("/download/xml/<path:nome>")
 def download_xml(nome):
-    return send_from_directory(storage.DIR_XML, nome, as_attachment=True)
+    conteudo = storage.obter_xml(nome)
+    if conteudo is None:
+        abort(404)
+    return Response(
+        conteudo,
+        mimetype="application/xml",
+        headers={"Content-Disposition": f'attachment; filename="{nome}"'},
+    )
 
 
 @app.route("/download/dat/<path:nome>")
 def download_dat(nome):
-    return send_from_directory(storage.DIR_DAT, nome, as_attachment=True)
+    conteudo = storage.obter_dat(nome)
+    if conteudo is None:
+        abort(404)
+    return Response(
+        conteudo,
+        mimetype="text/plain",
+        headers={"Content-Disposition": f'attachment; filename="{nome}"'},
+    )
 
 
 if __name__ == "__main__":

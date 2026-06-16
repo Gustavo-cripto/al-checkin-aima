@@ -1,4 +1,6 @@
-# Única dependência externa: a interface web.
-# O núcleo (geração de XML/.DAT e submissão pelo web service) usa só a
-# biblioteca-padrão do Python, por isso o fallback funciona mesmo sem isto.
+# Interface web.
 Flask>=3.0
+
+# Driver Postgres — usado SÓ no modo cloud (quando existe POSTGRES_URL).
+# Localmente não é preciso: o storage importa-o de forma tardia e usa ficheiros.
+psycopg2-binary>=2.9
