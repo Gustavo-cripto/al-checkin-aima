@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Check-in · Registo de Hóspede</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="card">
+    <h1>Check-in</h1>
+    <p class="sub">Preencha os seus dados. Campos com <span class="req">*</span> são obrigatórios.</p>
+
+    {% if erros %}
+    <div class="erros">
+      <strong>Corrija os seguintes pontos:</strong>
+      <ul>{% for e in erros %}<li>{{ e }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+
+    {% set v = valores or {} %}
+    <form method="post" action="{{ url_for('checkin') }}" autocomplete="off">
+
+      <div class="row two">
+        <label>Apelido <span class="req">*</span>
+          <input name="apelido" required value="{{ v.apelido or '' }}" placeholder="SILVA">
+        </label>
+        <label>Nome próprio
+          <input name="nome" value="{{ v.nome or '' }}" placeholder="MARIA JOÃO">
+        </label>
+      </div>
+
+      <div class="row two">
+        <label>Data de nascimento <span class="req">*</span>
+          <input type="date" name="data_nascimento" required value="{{ v.data_nascimento or '' }}">
+        </label>
+        <label>Local de nascimento
+          <input name="local_nascimento" value="{{ v.local_nascimento or '' }}" placeholder="Cidade">
+        </label>
+      </div>
+
+      <label>Nacionalidade <span class="req">*</span>
+        <select name="nacionalidade" required>
+          <option value="">— selecione —</option>
+          {% for cod, nome in paises %}
+          <option value="{{ cod }}" {{ 'selected' if v.nacionalidade==cod else '' }}>{{ nome }} ({{ cod }})</option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <div class="row two">
+        <label>Tipo de documento <span class="req">*</span>
+          <select name="tipo_documento" required>
+            <option value="">— selecione —</option>
+            {% for cod, nome in tipos_doc.items() %}
+            <option value="{{ cod }}" {{ 'selected' if v.tipo_documento==cod else '' }}>{{ nome }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>Nº do documento <span class="req">*</span>
+          <input name="documento_identificacao" required value="{{ v.documento_identificacao or '' }}" placeholder="Ex.: AB123456">
+        </label>
+      </div>
+
+      <label>País emissor do documento <span class="req">*</span>
+        <select name="pais_emissor_documento" required>
+          <option value="">— selecione —</option>
+          {% for cod, nome in paises %}
+          <option value="{{ cod }}" {{ 'selected' if v.pais_emissor_documento==cod else '' }}>{{ nome }} ({{ cod }})</option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <label>País de residência <span class="req">*</span>
+        <select name="pais_residencia_origem" required>
+          <option value="">— selecione —</option>
+          {% for cod, nome in paises %}
+          <option value="{{ cod }}" {{ 'selected' if v.pais_residencia_origem==cod else '' }}>{{ nome }} ({{ cod }})</option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <label>Local de residência
+        <input name="local_residencia_origem" value="{{ v.local_residencia_origem or '' }}" placeholder="Cidade">
+      </label>
+
+      <div class="row two">
+        <label>Data de entrada (check-in) <span class="req">*</span>
+          <input type="date" name="data_entrada" required value="{{ v.data_entrada or '' }}">
+        </label>
+        <label>Data de saída (check-out)
+          <input type="date" name="data_saida" value="{{ v.data_saida or '' }}">
+        </label>
+      </div>
+
+      <button type="submit">Concluir check-in</button>
+      <p class="nota">Os dados são usados apenas para a comunicação obrigatória de
+        alojamento à AIMA (SIBA), conforme a lei portuguesa.</p>
+    </form>
+  </main>
+</body>
+</html>

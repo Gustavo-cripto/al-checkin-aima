@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Resultado da submissão</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="card">
+    {% if resultado.sucesso %}
+    <div class="ok-badge">✓</div>
+    <h1>Submetido à AIMA</h1>
+    <p class="sub">A AIMA aceitou o boletim.</p>
+    <pre class="resposta">{{ resultado.mensagem }}</pre>
+    {% else %}
+    <div class="err-badge">!</div>
+    <h1>Submissão falhou</h1>
+    <p class="sub">O envio automático não foi concluído — mas <strong>nada se perdeu</strong>.
+      Use o fallback abaixo.</p>
+    <pre class="resposta">{{ resultado.mensagem }}</pre>
+
+    <div class="downloads">
+      <a class="btn outline" href="{{ url_for('download_xml', nome=nome_xml) }}">⬇ XML (AIMA)</a>
+      <a class="btn outline" href="{{ url_for('download_dat', nome=nome_dat) }}">⬇ .DAT (upload manual)</a>
+    </div>
+    <p class="nota">Carregue o ficheiro <code>.DAT</code> no portal SIBA
+      (Modo de envio → Upload de ficheiro). Os dados também estão guardados em
+      <code>data/boletins/</code>.</p>
+    {% endif %}
+
+    <a class="link" href="{{ url_for('index') }}">← Novo check-in</a>
+  </main>
+</body>
+</html>

@@ -1,0 +1,16 @@
+[
+  {
+    "apelido": "Silva",
+    "nome": "Maria João",
+    "nacionalidade": "BRA",
+    "data_nascimento": "1990-05-14",
+    "local_nascimento": "Lisboa",
+    "tipo_documento": "P",
+    "documento_identificacao": "FD123456",
+    "pais_emissor_documento": "BRA",
+    "pais_residencia_origem": "BRA",
+    "local_residencia_origem": "Sao Paulo",
+    "data_entrada": "2026-06-16",
+    "data_saida": "2026-06-20"
+  }
+]

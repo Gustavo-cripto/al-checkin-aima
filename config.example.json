@@ -1,0 +1,23 @@
+{
+  "unidade_hoteleira": {
+    "codigo": "000000000",
+    "estabelecimento": "1",
+    "chave_acesso": "PREENCHER_CHAVE_AIMA",
+    "nome": "WHITE SAND APARTMENTS",
+    "abreviatura": "WHITE SAND",
+    "morada": "RUA EXEMPLO 123",
+    "localidade": "ALBUFEIRA",
+    "codigo_postal": "8200",
+    "zona_postal": "001",
+    "telefone": "289000000",
+    "fax": "",
+    "nome_contacto": "GUSTAVO",
+    "email_contacto": "geral@whitesand.pt"
+  },
+  "webservice": {
+    "ativo": false,
+    "ambiente": "teste",
+    "soap_namespace": "http://siba.sef.pt/",
+    "_comentario": "ativo=true liga o botão de submissão automática. ambiente: 'teste' ou 'producao'. Confirmar o soap_namespace no WSDL: https://siba.sef.pt/baws/boletinsalojamento.asmx?wsdl"
+  }
+}

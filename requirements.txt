@@ -1,0 +1,4 @@
+# Única dependência externa: a interface web.
+# O núcleo (geração de XML/.DAT e submissão pelo web service) usa só a
+# biblioteca-padrão do Python, por isso o fallback funciona mesmo sem isto.
+Flask>=3.0
