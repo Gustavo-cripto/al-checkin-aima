@@ -3,20 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Check-in · Registo de Hóspede</title>
+  <title>Check-in · White Sand Apartments</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <header class="site-header">
     <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="site-logo">
+    <div class="lang-row">
+      <button class="lang-btn active" onclick="setLang('pt')">🇵🇹 PT</button>
+      <button class="lang-btn" onclick="setLang('en')">🇬🇧 EN</button>
+      <button class="lang-btn" onclick="setLang('es')">🇪🇸 ES</button>
+      <button class="lang-btn" onclick="setLang('fr')">🇫🇷 FR</button>
+      <button class="lang-btn" onclick="setLang('de')">🇩🇪 DE</button>
+    </div>
   </header>
+
   <main class="card">
-    <h1>Check-in</h1>
-    <p class="sub">Preencha os seus dados. Campos com <span class="req">*</span> são obrigatórios.</p>
+    <h1 data-i18n="titulo">Check-in</h1>
+    <p class="sub"><span data-i18n="subtitulo">Preencha os seus dados. Campos com</span> <span class="req">*</span> <span data-i18n="obrigatorios">são obrigatórios.</span></p>
 
     {% if erros %}
     <div class="erros">
-      <strong>Corrija os seguintes pontos:</strong>
+      <strong data-i18n="corrija">Corrija os seguintes pontos:</strong>
       <ul>{% for e in erros %}<li>{{ e }}</li>{% endfor %}</ul>
     </div>
     {% endif %}
@@ -25,26 +33,26 @@
     <form method="post" action="{{ url_for('checkin') }}" autocomplete="off">
 
       <div class="row two">
-        <label>Apelido <span class="req">*</span>
+        <label><span data-i18n="apelido">Apelido</span> <span class="req">*</span>
           <input name="apelido" required value="{{ v.apelido or '' }}" placeholder="SILVA">
         </label>
-        <label>Nome próprio
+        <label><span data-i18n="nome">Nome próprio</span>
           <input name="nome" value="{{ v.nome or '' }}" placeholder="MARIA JOÃO">
         </label>
       </div>
 
       <div class="row two">
-        <label>Data de nascimento <span class="req">*</span>
+        <label><span data-i18n="data_nasc">Data de nascimento</span> <span class="req">*</span>
           <input type="date" name="data_nascimento" required value="{{ v.data_nascimento or '' }}">
         </label>
-        <label>Local de nascimento
-          <input name="local_nascimento" value="{{ v.local_nascimento or '' }}" placeholder="Cidade">
+        <label><span data-i18n="local_nasc">Local de nascimento</span>
+          <input name="local_nascimento" value="{{ v.local_nascimento or '' }}" data-i18n-placeholder="cidade" placeholder="Cidade">
         </label>
       </div>
 
-      <label>Nacionalidade <span class="req">*</span>
+      <label><span data-i18n="nacionalidade">Nacionalidade</span> <span class="req">*</span>
         <select name="nacionalidade" required>
-          <option value="">— selecione —</option>
+          <option value="" data-i18n="selecione">— selecione —</option>
           {% for cod, nome in paises %}
           <option value="{{ cod }}" {{ 'selected' if v.nacionalidade==cod else '' }}>{{ nome }} ({{ cod }})</option>
           {% endfor %}
@@ -52,61 +60,140 @@
       </label>
 
       <div class="row two">
-        <label>Tipo de documento <span class="req">*</span>
+        <label><span data-i18n="tipo_doc">Tipo de documento</span> <span class="req">*</span>
           <select name="tipo_documento" required>
-            <option value="">— selecione —</option>
+            <option value="" data-i18n="selecione">— selecione —</option>
             {% for cod, nome in tipos_doc.items() %}
             <option value="{{ cod }}" {{ 'selected' if v.tipo_documento==cod else '' }}>{{ nome }}</option>
             {% endfor %}
           </select>
         </label>
-        <label>Nº do documento <span class="req">*</span>
+        <label><span data-i18n="num_doc">Nº do documento</span> <span class="req">*</span>
           <input name="documento_identificacao" required value="{{ v.documento_identificacao or '' }}" placeholder="Ex.: AB123456">
         </label>
       </div>
 
-      <label>País emissor do documento <span class="req">*</span>
+      <label><span data-i18n="pais_emissor">País emissor do documento</span> <span class="req">*</span>
         <select name="pais_emissor_documento" required>
-          <option value="">— selecione —</option>
+          <option value="" data-i18n="selecione">— selecione —</option>
           {% for cod, nome in paises %}
           <option value="{{ cod }}" {{ 'selected' if v.pais_emissor_documento==cod else '' }}>{{ nome }} ({{ cod }})</option>
           {% endfor %}
         </select>
       </label>
 
-      <label>País de residência <span class="req">*</span>
+      <label><span data-i18n="pais_residencia">País de residência</span> <span class="req">*</span>
         <select name="pais_residencia_origem" required>
-          <option value="">— selecione —</option>
+          <option value="" data-i18n="selecione">— selecione —</option>
           {% for cod, nome in paises %}
           <option value="{{ cod }}" {{ 'selected' if v.pais_residencia_origem==cod else '' }}>{{ nome }} ({{ cod }})</option>
           {% endfor %}
         </select>
       </label>
 
-      <label>Local de residência
-        <input name="local_residencia_origem" value="{{ v.local_residencia_origem or '' }}" placeholder="Cidade">
+      <label><span data-i18n="local_residencia">Local de residência</span>
+        <input name="local_residencia_origem" value="{{ v.local_residencia_origem or '' }}" data-i18n-placeholder="cidade" placeholder="Cidade">
       </label>
 
       <div class="row two">
-        <label>Data de entrada (check-in) <span class="req">*</span>
+        <label><span data-i18n="data_entrada">Data de entrada (check-in)</span> <span class="req">*</span>
           <input type="date" name="data_entrada" required value="{{ v.data_entrada or '' }}">
         </label>
-        <label>Data de saída (check-out)
+        <label><span data-i18n="data_saida">Data de saída (check-out)</span>
           <input type="date" name="data_saida" value="{{ v.data_saida or '' }}">
         </label>
       </div>
 
-      <button type="submit">Concluir check-in</button>
-      <p class="nota">Os dados são usados apenas para a comunicação obrigatória de
-        alojamento à AIMA (SIBA), conforme a lei portuguesa.</p>
+      <button type="submit" data-i18n="btn_submit">Concluir check-in</button>
+      <p class="nota" data-i18n="nota">Os dados são usados apenas para a comunicação obrigatória de alojamento à AIMA (SIBA), conforme a lei portuguesa.</p>
     </form>
   </main>
 
   <footer class="site-footer">
-    <p class="footer-title">Contactos do Anfitrião</p>
+    <p class="footer-title" data-i18n="contactos">Contactos do Anfitrião</p>
     <p>📞 <a href="tel:+351XXXXXXXXX">+351 XXX XXX XXX</a></p>
     <p>💬 <a href="https://wa.me/351XXXXXXXXX">WhatsApp</a></p>
     <p>✉️ <a href="mailto:email@exemplo.com">email@exemplo.com</a></p>
   </footer>
+
+<script>
+const T = {
+  pt: {
+    titulo: "Check-in", subtitulo: "Preencha os seus dados. Campos com", obrigatorios: "são obrigatórios.",
+    corrija: "Corrija os seguintes pontos:", apelido: "Apelido", nome: "Nome próprio",
+    data_nasc: "Data de nascimento", local_nasc: "Local de nascimento", nacionalidade: "Nacionalidade",
+    tipo_doc: "Tipo de documento", num_doc: "Nº do documento", pais_emissor: "País emissor do documento",
+    pais_residencia: "País de residência", local_residencia: "Local de residência",
+    data_entrada: "Data de entrada (check-in)", data_saida: "Data de saída (check-out)",
+    btn_submit: "Concluir check-in", selecione: "— selecione —", cidade: "Cidade",
+    nota: "Os dados são usados apenas para a comunicação obrigatória de alojamento à AIMA (SIBA), conforme a lei portuguesa.",
+    contactos: "Contactos do Anfitrião",
+  },
+  en: {
+    titulo: "Check-in", subtitulo: "Fill in your details. Fields with", obrigatorios: "are required.",
+    corrija: "Please correct the following:", apelido: "Surname", nome: "First name",
+    data_nasc: "Date of birth", local_nasc: "Place of birth", nacionalidade: "Nationality",
+    tipo_doc: "Document type", num_doc: "Document number", pais_emissor: "Document issuing country",
+    pais_residencia: "Country of residence", local_residencia: "Place of residence",
+    data_entrada: "Check-in date", data_saida: "Check-out date",
+    btn_submit: "Complete check-in", selecione: "— select —", cidade: "City",
+    nota: "Your data is used solely for the mandatory guest registration with AIMA (SIBA), as required by Portuguese law.",
+    contactos: "Host Contacts",
+  },
+  es: {
+    titulo: "Check-in", subtitulo: "Complete sus datos. Los campos con", obrigatorios: "son obligatorios.",
+    corrija: "Corrija los siguientes puntos:", apelido: "Apellido", nome: "Nombre",
+    data_nasc: "Fecha de nacimiento", local_nasc: "Lugar de nacimiento", nacionalidade: "Nacionalidad",
+    tipo_doc: "Tipo de documento", num_doc: "Nº de documento", pais_emissor: "País emisor del documento",
+    pais_residencia: "País de residencia", local_residencia: "Lugar de residencia",
+    data_entrada: "Fecha de entrada (check-in)", data_saida: "Fecha de salida (check-out)",
+    btn_submit: "Completar check-in", selecione: "— seleccione —", cidade: "Ciudad",
+    nota: "Sus datos se utilizan únicamente para la comunicación obligatoria de alojamiento a AIMA (SIBA), conforme a la ley portuguesa.",
+    contactos: "Contactos del Anfitrión",
+  },
+  fr: {
+    titulo: "Check-in", subtitulo: "Remplissez vos coordonnées. Les champs avec", obrigatorios: "sont obligatoires.",
+    corrija: "Veuillez corriger les points suivants :", apelido: "Nom de famille", nome: "Prénom",
+    data_nasc: "Date de naissance", local_nasc: "Lieu de naissance", nacionalidade: "Nationalité",
+    tipo_doc: "Type de document", num_doc: "N° de document", pais_emissor: "Pays émetteur du document",
+    pais_residencia: "Pays de résidence", local_residencia: "Lieu de résidence",
+    data_entrada: "Date d'arrivée (check-in)", data_saida: "Date de départ (check-out)",
+    btn_submit: "Finaliser le check-in", selecione: "— sélectionner —", cidade: "Ville",
+    nota: "Vos données sont utilisées uniquement pour la communication obligatoire d'hébergement à l'AIMA (SIBA), conformément à la loi portugaise.",
+    contactos: "Contacts de l'hôte",
+  },
+  de: {
+    titulo: "Check-in", subtitulo: "Bitte füllen Sie Ihre Daten aus. Felder mit", obrigatorios: "sind Pflichtfelder.",
+    corrija: "Bitte korrigieren Sie folgende Punkte:", apelido: "Nachname", nome: "Vorname",
+    data_nasc: "Geburtsdatum", local_nasc: "Geburtsort", nacionalidade: "Staatsangehörigkeit",
+    tipo_doc: "Dokumententyp", num_doc: "Dokumentennummer", pais_emissor: "Ausstellungsland des Dokuments",
+    pais_residencia: "Wohnsitzland", local_residencia: "Wohnort",
+    data_entrada: "Anreisedatum (Check-in)", data_saida: "Abreisedatum (Check-out)",
+    btn_submit: "Check-in abschließen", selecione: "— auswählen —", cidade: "Stadt",
+    nota: "Ihre Daten werden ausschließlich für die gesetzlich vorgeschriebene Meldung bei der AIMA (SIBA) nach portugiesischem Recht verwendet.",
+    contactos: "Kontakte des Gastgebers",
+  },
+};
+
+function setLang(lang) {
+  const t = T[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key]) el.textContent = t[key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (t[key]) el.placeholder = t[key];
+  });
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+  document.documentElement.lang = lang;
+  localStorage.setItem('lang', lang);
+}
+
+// Restaurar língua guardada
+const saved = localStorage.getItem('lang');
+if (saved && T[saved]) setLang(saved);
+</script>
 </body>
 </html>

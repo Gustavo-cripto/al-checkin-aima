@@ -92,6 +92,26 @@ button:hover, .btn:hover { background: var(--brand-dark); }
   width: 90%;
   height: auto;
 }
+.lang-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+.lang-btn {
+  background: rgba(255,255,255,0.7);
+  border: 1.5px solid var(--line);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--ink);
+  transition: background .15s, border-color .15s;
+}
+.lang-btn:hover { background: #fff; border-color: var(--brand); }
+.lang-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
 
 .site-footer {
   text-align: center;
