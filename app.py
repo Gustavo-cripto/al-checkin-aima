@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 import os
+import urllib.request
 
 from flask import (
     Flask, Response, abort, render_template, request, url_for,
@@ -29,6 +30,45 @@ from siba.models import TIPO_DOC, Boletim, UnidadeHoteleira
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__)
+
+
+def enviar_email_checkin(boletim: Boletim, nome_xml: str, xml: str) -> None:
+    """Envia email de notificação via Resend. Silencioso em caso de erro."""
+    api_key = os.environ.get("RESEND_API_KEY")
+    email_destino = os.environ.get("NOTIFY_EMAIL")
+    if not api_key or not email_destino:
+        return
+    try:
+        corpo = f"""
+<h2>Novo Check-in Registado</h2>
+<table style="font-family:sans-serif;border-collapse:collapse">
+  <tr><td style="padding:4px 12px;color:#666">Nome</td><td style="padding:4px 12px"><b>{boletim.apelido}, {boletim.nome}</b></td></tr>
+  <tr><td style="padding:4px 12px;color:#666">Nascimento</td><td style="padding:4px 12px">{boletim.data_nascimento}</td></tr>
+  <tr><td style="padding:4px 12px;color:#666">Nacionalidade</td><td style="padding:4px 12px">{boletim.nacionalidade}</td></tr>
+  <tr><td style="padding:4px 12px;color:#666">Documento</td><td style="padding:4px 12px">{boletim.tipo_documento} {boletim.documento_identificacao}</td></tr>
+  <tr><td style="padding:4px 12px;color:#666">Check-in</td><td style="padding:4px 12px">{boletim.data_entrada}</td></tr>
+  <tr><td style="padding:4px 12px;color:#666">Check-out</td><td style="padding:4px 12px">{boletim.data_saida or '—'}</td></tr>
+  <tr><td style="padding:4px 12px;color:#666">Ficheiro</td><td style="padding:4px 12px">{nome_xml}</td></tr>
+</table>
+<p style="color:#888;font-size:12px">Enviado automaticamente pelo sistema AL Check-in / White Sand Apartments</p>
+"""
+        payload = json.dumps({
+            "from": "checkin@resend.dev",
+            "to": [email_destino],
+            "subject": f"Check-in: {boletim.apelido}, {boletim.nome} ({boletim.data_entrada})",
+            "html": corpo,
+        }).encode()
+        req = urllib.request.Request(
+            "https://api.resend.com/emails",
+            data=payload,
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+        )
+        urllib.request.urlopen(req, timeout=8)
+    except Exception as exc:
+        app.logger.warning("Email não enviado: %s", exc)
 
 
 def carregar_config() -> dict:
@@ -89,6 +129,9 @@ def checkin():
         f"check-in {boletim_id} {boletim.apelido} {boletim.nome} "
         f"-> ficheiro nº {numero} ({ficheiros['nome_xml']})"
     )
+
+    # Notificação por email (silenciosa se não configurado)
+    enviar_email_checkin(boletim, ficheiros["nome_xml"], ficheiros["xml"])
 
     return render_template(
         "sucesso.html",
