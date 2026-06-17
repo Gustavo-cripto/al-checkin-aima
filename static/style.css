@@ -82,6 +82,34 @@ button:hover, .btn:hover { background: var(--brand-dark); }
 .nota { font-size: .78rem; color: var(--muted); margin-top: 14px; line-height: 1.45; }
 .link { display: inline-block; margin-top: 18px; color: var(--brand-dark); font-weight: 600; text-decoration: none; }
 
+.site-header {
+  text-align: center;
+  padding: 24px 16px 8px;
+}
+.site-logo {
+  max-width: 200px;
+  height: auto;
+}
+
+.site-footer {
+  text-align: center;
+  padding: 24px 16px 32px;
+  color: var(--ink);
+  font-size: .9rem;
+  line-height: 1.8;
+}
+.footer-title {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+.site-footer a {
+  color: var(--brand-dark);
+  text-decoration: none;
+  font-weight: 600;
+}
+.site-footer a:hover { text-decoration: underline; }
+
 .erros {
   background: #fdecea; border: 1px solid #f5c6cb; color: var(--err);
   padding: 12px 14px; border-radius: 10px; margin-bottom: 16px; font-size: .9rem;

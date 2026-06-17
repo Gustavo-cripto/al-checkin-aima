@@ -7,6 +7,9 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+  <header class="site-header">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="site-logo">
+  </header>
   <main class="card">
     <h1>Check-in</h1>
     <p class="sub">Preencha os seus dados. Campos com <span class="req">*</span> são obrigatórios.</p>
@@ -98,5 +101,12 @@
         alojamento à AIMA (SIBA), conforme a lei portuguesa.</p>
     </form>
   </main>
+
+  <footer class="site-footer">
+    <p class="footer-title">Contactos do Anfitrião</p>
+    <p>📞 <a href="tel:+351XXXXXXXXX">+351 XXX XXX XXX</a></p>
+    <p>💬 <a href="https://wa.me/351XXXXXXXXX">WhatsApp</a></p>
+    <p>✉️ <a href="mailto:email@exemplo.com">email@exemplo.com</a></p>
+  </footer>
 </body>
 </html>
