@@ -109,6 +109,8 @@ button:hover, .btn:hover { background: var(--brand-dark); }
   cursor: pointer;
   color: var(--ink);
   transition: background .15s, border-color .15s;
+  width: auto;
+  display: inline-block;
 }
 .lang-btn:hover { background: #fff; border-color: var(--brand); }
 .lang-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
