@@ -3,41 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Check-in concluído</title>
+  <title>Check-in concluído · White Sand Apartments</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <main class="card">
-    <div class="ok-badge">✓</div>
-    <h1>Check-in concluído</h1>
-    <p class="sub">Boletim de <strong>{{ boletim.apelido }} {{ boletim.nome }}</strong>
-      guardado e pronto para a AIMA (ficheiro nº {{ numero }}).</p>
+  <header class="site-header">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="site-logo">
+  </header>
+  <main class="card" style="text-align:center">
+    <div class="ok-badge" style="margin:0 auto 16px">✓</div>
+    <h1>Check-in concluído!</h1>
+    <p class="sub">Obrigado, <strong>{{ boletim.apelido }} {{ boletim.nome }}</strong>.<br>
+      O seu registo foi submetido com sucesso.</p>
 
-    <div class="resumo">
-      <div><span>Nacionalidade</span> {{ boletim.nacionalidade }}</div>
-      <div><span>Documento</span> {{ boletim.tipo_documento }} · {{ boletim.documento_identificacao }}</div>
+    <div class="resumo" style="text-align:left;margin:20px 0">
       <div><span>Entrada</span> {{ boletim.data_entrada }}</div>
       {% if boletim.data_saida %}<div><span>Saída</span> {{ boletim.data_saida }}</div>{% endif %}
     </div>
 
-    <div class="downloads">
-      <a class="btn outline" href="{{ url_for('download_xml', nome=nome_xml) }}">⬇ Descarregar XML (AIMA)</a>
-      <a class="btn outline" href="{{ url_for('download_dat', nome=nome_dat) }}">⬇ Descarregar .DAT (upload manual)</a>
-    </div>
-
-    {% if envio_auto %}
-    <form method="post" action="{{ url_for('submeter') }}">
-      <input type="hidden" name="nome_xml" value="{{ nome_xml }}">
-      <button type="submit">📡 Submeter automaticamente à AIMA</button>
-    </form>
-    <p class="nota">Se a submissão automática falhar, o XML e o .DAT acima ficam
-      guardados na pasta do projeto, prontos para upload manual no portal SIBA.</p>
-    {% else %}
-    <p class="nota">Submissão automática desativada. Os ficheiros estão guardados na
-      pasta <code>data/</code> e podem ser carregados manualmente no portal SIBA.</p>
-    {% endif %}
-
-    <a class="link" href="{{ url_for('index') }}">← Novo check-in</a>
+    <p class="nota">Pode fechar esta página. Boas férias! 🌊</p>
   </main>
 </body>
 </html>
