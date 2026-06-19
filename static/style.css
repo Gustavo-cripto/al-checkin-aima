@@ -115,6 +115,15 @@ button:hover, .btn:hover { background: var(--brand-dark); }
 .lang-btn:hover { background: #fff; border-color: var(--brand); }
 .lang-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
 
+.apt-badge {
+  text-align: center;
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--brand-dark);
+  margin: 0 0 12px;
+  letter-spacing: .02em;
+}
+
 .site-footer {
   text-align: center;
   padding: 24px 16px 32px;

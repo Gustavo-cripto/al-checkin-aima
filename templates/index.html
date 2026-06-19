@@ -30,16 +30,11 @@
     {% endif %}
 
     {% set v = valores or {} %}
+    {% if apt_nome %}
+    <p class="apt-badge">🏠 {{ apt_nome }}</p>
+    {% endif %}
     <form method="post" action="{{ url_for('checkin') }}" autocomplete="off">
-
-      <label><span data-i18n="apartamento">Apartamento</span> <span class="req">*</span>
-        <select name="apartamento" required>
-          <option value="" data-i18n="selecione">— selecione —</option>
-          {% for cod, apt in apartamentos.items() %}
-          <option value="{{ cod }}" {{ 'selected' if (v.apartamento or '')==cod else '' }}>{{ apt.nome }}</option>
-          {% endfor %}
-        </select>
-      </label>
+      <input type="hidden" name="apartamento" value="{{ apt or v.apartamento or '' }}">
 
       <div class="row two">
         <label><span data-i18n="apelido">Apelido</span> <span class="req">*</span>

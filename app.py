@@ -129,11 +129,13 @@ def carregar_config() -> dict:
 
 @app.route("/")
 def index():
+    apt = request.args.get("apt", "")
     return render_template(
         "index.html",
         paises=lista_ordenada(),
         tipos_doc=TIPO_DOC,
-        apartamentos=APARTAMENTOS,
+        apt=apt,
+        apt_nome=APARTAMENTOS.get(apt, {}).get("nome", ""),
     )
 
 
@@ -142,7 +144,7 @@ def checkin():
     cfg = carregar_config()
     unidade = UnidadeHoteleira.from_config(cfg)
 
-    # Sobrepor estabelecimento e chave conforme o apartamento selecionado
+    # Apartamento vem do campo hidden (lido do URL ?apt=X)
     apto_key = request.form.get("apartamento", "")
     apto = APARTAMENTOS.get(apto_key)
     if apto:
@@ -152,14 +154,13 @@ def checkin():
 
     boletim = Boletim.from_form(request.form.to_dict())
     erros = boletim.validate()
-    if not apto_key:
-        erros = (erros or []) + ["Selecione o apartamento."]
     if erros:
         return render_template(
             "index.html",
             paises=lista_ordenada(),
             tipos_doc=TIPO_DOC,
-            apartamentos=APARTAMENTOS,
+            apt=apto_key,
+            apt_nome=APARTAMENTOS.get(apto_key, {}).get("nome", ""),
             erros=erros,
             valores=request.form.to_dict(),
         ), 400
