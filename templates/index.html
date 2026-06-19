@@ -32,6 +32,15 @@
     {% set v = valores or {} %}
     <form method="post" action="{{ url_for('checkin') }}" autocomplete="off">
 
+      <label><span data-i18n="apartamento">Apartamento</span> <span class="req">*</span>
+        <select name="apartamento" required>
+          <option value="" data-i18n="selecione">— selecione —</option>
+          {% for cod, apt in apartamentos.items() %}
+          <option value="{{ cod }}" {{ 'selected' if (v.apartamento or '')==cod else '' }}>{{ apt.nome }}</option>
+          {% endfor %}
+        </select>
+      </label>
+
       <div class="row two">
         <label><span data-i18n="apelido">Apelido</span> <span class="req">*</span>
           <input name="apelido" required value="{{ v.apelido or '' }}" placeholder="SILVA">
@@ -120,6 +129,7 @@
 const T = {
   pt: {
     titulo: "Check-in", subtitulo: "Preencha os seus dados. Campos com", obrigatorios: "são obrigatórios.",
+    apartamento: "Apartamento",
     corrija: "Corrija os seguintes pontos:", apelido: "Apelido", nome: "Nome próprio",
     data_nasc: "Data de nascimento", local_nasc: "Local de nascimento", nacionalidade: "Nacionalidade",
     tipo_doc: "Tipo de documento", num_doc: "Nº do documento", pais_emissor: "País emissor do documento",
@@ -131,6 +141,7 @@ const T = {
   },
   en: {
     titulo: "Check-in", subtitulo: "Fill in your details. Fields with", obrigatorios: "are required.",
+    apartamento: "Apartment",
     corrija: "Please correct the following:", apelido: "Surname", nome: "First name",
     data_nasc: "Date of birth", local_nasc: "Place of birth", nacionalidade: "Nationality",
     tipo_doc: "Document type", num_doc: "Document number", pais_emissor: "Document issuing country",
@@ -142,6 +153,7 @@ const T = {
   },
   es: {
     titulo: "Check-in", subtitulo: "Complete sus datos. Los campos con", obrigatorios: "son obligatorios.",
+    apartamento: "Apartamento",
     corrija: "Corrija los siguientes puntos:", apelido: "Apellido", nome: "Nombre",
     data_nasc: "Fecha de nacimiento", local_nasc: "Lugar de nacimiento", nacionalidade: "Nacionalidad",
     tipo_doc: "Tipo de documento", num_doc: "Nº de documento", pais_emissor: "País emisor del documento",
@@ -153,6 +165,7 @@ const T = {
   },
   fr: {
     titulo: "Check-in", subtitulo: "Remplissez vos coordonnées. Les champs avec", obrigatorios: "sont obligatoires.",
+    apartamento: "Appartement",
     corrija: "Veuillez corriger les points suivants :", apelido: "Nom de famille", nome: "Prénom",
     data_nasc: "Date de naissance", local_nasc: "Lieu de naissance", nacionalidade: "Nationalité",
     tipo_doc: "Type de document", num_doc: "N° de document", pais_emissor: "Pays émetteur du document",
@@ -164,6 +177,7 @@ const T = {
   },
   de: {
     titulo: "Check-in", subtitulo: "Bitte füllen Sie Ihre Daten aus. Felder mit", obrigatorios: "sind Pflichtfelder.",
+    apartamento: "Apartment",
     corrija: "Bitte korrigieren Sie folgende Punkte:", apelido: "Nachname", nome: "Vorname",
     data_nasc: "Geburtsdatum", local_nasc: "Geburtsort", nacionalidade: "Staatsangehörigkeit",
     tipo_doc: "Dokumententyp", num_doc: "Dokumentennummer", pais_emissor: "Ausstellungsland des Dokuments",

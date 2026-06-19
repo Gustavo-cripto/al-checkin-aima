@@ -34,6 +34,18 @@ app = Flask(__name__)
 
 NOTIFY_EMAIL = "azulequatorial@outlook.com"
 
+APARTAMENTOS = {
+    "C": {"estabelecimento": "0", "chave_acesso": "257585029368", "nome": "Apartamento C"},
+    "B": {"estabelecimento": "1", "chave_acesso": "257586504456", "nome": "Apartamento B"},
+    "E": {"estabelecimento": "2", "chave_acesso": "257588717088", "nome": "Apartamento E"},
+    "F": {"estabelecimento": "3", "chave_acesso": "257590929720", "nome": "Apartamento F"},
+    "I": {"estabelecimento": "4", "chave_acesso": "257593142352", "nome": "Apartamento I"},
+    "H": {"estabelecimento": "5", "chave_acesso": "257594617440", "nome": "Apartamento H"},
+    "G": {"estabelecimento": "6", "chave_acesso": "257929477806", "nome": "Apartamento G"},
+    "J": {"estabelecimento": "7", "chave_acesso": "257932431834", "nome": "Apartamento J"},
+    "D": {"estabelecimento": "8", "chave_acesso": "258189983535", "nome": "Apartamento D"},
+}
+
 
 def enviar_email_checkin(boletim: Boletim, nome_xml: str, xml: str) -> None:
     """Envia email com XML em anexo via Resend. Silencioso em caso de erro."""
@@ -121,6 +133,7 @@ def index():
         "index.html",
         paises=lista_ordenada(),
         tipos_doc=TIPO_DOC,
+        apartamentos=APARTAMENTOS,
     )
 
 
@@ -129,13 +142,24 @@ def checkin():
     cfg = carregar_config()
     unidade = UnidadeHoteleira.from_config(cfg)
 
+    # Sobrepor estabelecimento e chave conforme o apartamento selecionado
+    apto_key = request.form.get("apartamento", "")
+    apto = APARTAMENTOS.get(apto_key)
+    if apto:
+        unidade.estabelecimento = apto["estabelecimento"]
+        unidade.chave_acesso = apto["chave_acesso"]
+        unidade.nome = f"WHITE SAND APARTMENTS - {apto['nome'].upper()}"
+
     boletim = Boletim.from_form(request.form.to_dict())
     erros = boletim.validate()
+    if not apto_key:
+        erros = (erros or []) + ["Selecione o apartamento."]
     if erros:
         return render_template(
             "index.html",
             paises=lista_ordenada(),
             tipos_doc=TIPO_DOC,
+            apartamentos=APARTAMENTOS,
             erros=erros,
             valores=request.form.to_dict(),
         ), 400
