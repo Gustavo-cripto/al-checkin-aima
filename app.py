@@ -79,7 +79,7 @@ def enviar_email_checkin(boletim: Boletim, nome_xml: str, xml: str) -> None:
 """
         xml_b64 = base64.b64encode(xml.encode("utf-8")).decode("ascii")
         payload = json.dumps({
-            "from": "checkin@resend.dev",
+            "from": "onboarding@resend.dev",
             "to": [NOTIFY_EMAIL],
             "subject": f"✅ Check-in: {boletim.apelido}, {boletim.nome} ({boletim.data_entrada})",
             "html": corpo,
