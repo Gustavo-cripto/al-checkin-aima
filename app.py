@@ -32,31 +32,51 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__)
 
 
+NOTIFY_EMAIL = "azulequatorial@outlook.com"
+
+
 def enviar_email_checkin(boletim: Boletim, nome_xml: str, xml: str) -> None:
-    """Envia email de notificação via Resend. Silencioso em caso de erro."""
+    """Envia email com XML em anexo via Resend. Silencioso em caso de erro."""
+    import base64
     api_key = os.environ.get("RESEND_API_KEY")
-    email_destino = os.environ.get("NOTIFY_EMAIL")
-    if not api_key or not email_destino:
+    if not api_key:
+        app.logger.warning("RESEND_API_KEY não configurado — email não enviado")
         return
     try:
         corpo = f"""
-<h2>Novo Check-in Registado</h2>
-<table style="font-family:sans-serif;border-collapse:collapse">
-  <tr><td style="padding:4px 12px;color:#666">Nome</td><td style="padding:4px 12px"><b>{boletim.apelido}, {boletim.nome}</b></td></tr>
-  <tr><td style="padding:4px 12px;color:#666">Nascimento</td><td style="padding:4px 12px">{boletim.data_nascimento}</td></tr>
-  <tr><td style="padding:4px 12px;color:#666">Nacionalidade</td><td style="padding:4px 12px">{boletim.nacionalidade}</td></tr>
-  <tr><td style="padding:4px 12px;color:#666">Documento</td><td style="padding:4px 12px">{boletim.tipo_documento} {boletim.documento_identificacao}</td></tr>
-  <tr><td style="padding:4px 12px;color:#666">Check-in</td><td style="padding:4px 12px">{boletim.data_entrada}</td></tr>
-  <tr><td style="padding:4px 12px;color:#666">Check-out</td><td style="padding:4px 12px">{boletim.data_saida or '—'}</td></tr>
-  <tr><td style="padding:4px 12px;color:#666">Ficheiro</td><td style="padding:4px 12px">{nome_xml}</td></tr>
+<h2 style="font-family:sans-serif;color:#1f2a37">Novo Check-in — White Sand Apartments</h2>
+<table style="font-family:sans-serif;border-collapse:collapse;font-size:14px">
+  <tr><td style="padding:5px 16px 5px 0;color:#666;white-space:nowrap">Hóspede</td>
+      <td style="padding:5px 0"><b>{boletim.apelido}, {boletim.nome}</b></td></tr>
+  <tr><td style="padding:5px 16px 5px 0;color:#666">Nascimento</td>
+      <td style="padding:5px 0">{boletim.data_nascimento}</td></tr>
+  <tr><td style="padding:5px 16px 5px 0;color:#666">Nacionalidade</td>
+      <td style="padding:5px 0">{boletim.nacionalidade}</td></tr>
+  <tr><td style="padding:5px 16px 5px 0;color:#666">Documento</td>
+      <td style="padding:5px 0">{boletim.tipo_documento} · {boletim.documento_identificacao}</td></tr>
+  <tr><td style="padding:5px 16px 5px 0;color:#666">Check-in</td>
+      <td style="padding:5px 0">{boletim.data_entrada}</td></tr>
+  <tr><td style="padding:5px 16px 5px 0;color:#666">Check-out</td>
+      <td style="padding:5px 0">{boletim.data_saida or '—'}</td></tr>
+  <tr><td style="padding:5px 16px 5px 0;color:#666">Ficheiro XML</td>
+      <td style="padding:5px 0">{nome_xml}</td></tr>
 </table>
-<p style="color:#888;font-size:12px">Enviado automaticamente pelo sistema AL Check-in / White Sand Apartments</p>
+<p style="font-family:sans-serif;color:#aaa;font-size:11px;margin-top:24px">
+  Enviado automaticamente · White Sand Apartments AL Check-in
+</p>
 """
+        xml_b64 = base64.b64encode(xml.encode("utf-8")).decode("ascii")
         payload = json.dumps({
             "from": "checkin@resend.dev",
-            "to": [email_destino],
-            "subject": f"Check-in: {boletim.apelido}, {boletim.nome} ({boletim.data_entrada})",
+            "to": [NOTIFY_EMAIL],
+            "subject": f"✅ Check-in: {boletim.apelido}, {boletim.nome} ({boletim.data_entrada})",
             "html": corpo,
+            "attachments": [
+                {
+                    "filename": nome_xml,
+                    "content": xml_b64,
+                }
+            ],
         }).encode()
         req = urllib.request.Request(
             "https://api.resend.com/emails",
@@ -66,7 +86,8 @@ def enviar_email_checkin(boletim: Boletim, nome_xml: str, xml: str) -> None:
                 "Content-Type": "application/json",
             },
         )
-        urllib.request.urlopen(req, timeout=8)
+        urllib.request.urlopen(req, timeout=10)
+        app.logger.info("Email enviado para %s (%s)", NOTIFY_EMAIL, nome_xml)
     except Exception as exc:
         app.logger.warning("Email não enviado: %s", exc)
 
