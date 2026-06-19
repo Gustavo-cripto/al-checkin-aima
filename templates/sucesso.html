@@ -10,18 +10,26 @@
   <header class="site-header">
     <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="site-logo">
   </header>
-  <main class="card" style="text-align:center">
-    <div class="ok-badge" style="margin:0 auto 16px">✓</div>
-    <h1>Check-in concluído!</h1>
-    <p class="sub">Obrigado, <strong>{{ boletim.apelido }} {{ boletim.nome }}</strong>.<br>
-      O seu registo foi submetido com sucesso.</p>
+  <main class="card sucesso-card">
+    <div class="ok-badge">✓</div>
+    <h1 class="sucesso-titulo">Check-in concluído!</h1>
+    <p class="sucesso-nome">Bem-vindo(a), <strong>{{ boletim.nome }} {{ boletim.apelido }}</strong></p>
+    <p class="sub">O seu registo foi submetido com sucesso.</p>
 
-    <div class="resumo" style="text-align:left;margin:20px 0">
-      <div><span>Entrada</span> {{ boletim.data_entrada }}</div>
-      {% if boletim.data_saida %}<div><span>Saída</span> {{ boletim.data_saida }}</div>{% endif %}
+    <div class="resumo sucesso-resumo">
+      <div>
+        <span>✈️ Entrada</span>
+        <b>{{ boletim.data_entrada[6:8] }}/{{ boletim.data_entrada[4:6] }}/{{ boletim.data_entrada[0:4] }}</b>
+      </div>
+      {% if boletim.data_saida %}
+      <div>
+        <span>🏠 Saída</span>
+        <b>{{ boletim.data_saida[6:8] }}/{{ boletim.data_saida[4:6] }}/{{ boletim.data_saida[0:4] }}</b>
+      </div>
+      {% endif %}
     </div>
 
-    <p class="nota">Pode fechar esta página. Boas férias! 🌊</p>
+    <p class="nota sucesso-nota">Pode fechar esta página.<br>Boas férias! 🌊</p>
   </main>
 </body>
 </html>
