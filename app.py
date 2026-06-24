@@ -51,6 +51,7 @@ def enviar_email_checkin(boletim: Boletim, nome_xml: str, xml: str) -> None:
     """Envia email com XML em anexo via Resend. Silencioso em caso de erro."""
     import base64
     api_key = os.environ.get("RESEND_API_KEY")
+    app.logger.warning("DEBUG key prefix: %s", (api_key or "")[:8])
     if not api_key:
         app.logger.warning("RESEND_API_KEY não configurado — email não enviado")
         return
