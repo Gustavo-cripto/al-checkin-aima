@@ -47,7 +47,7 @@ APARTAMENTOS = {
 }
 
 
-def enviar_email_checkin(boletim: Boletim, nome_xml: str, xml: str) -> None:
+def enviar_email_checkin(boletim: Boletim, nome_xml: str, xml: str, nome_dat: str = "", dat: str = "") -> None:
     """Envia email com XML em anexo via Resend. Silencioso em caso de erro."""
     import base64
     api_key = os.environ.get("RESEND_API_KEY")
@@ -84,7 +84,13 @@ def enviar_email_checkin(boletim: Boletim, nome_xml: str, xml: str) -> None:
             "to": [NOTIFY_EMAIL],
             "subject": f"✅ Check-in: {boletim.apelido}, {boletim.nome} ({boletim.data_entrada})",
             "html": corpo,
-            "attachments": [{"filename": nome_xml, "content": xml_b64}],
+            "attachments": [
+                {"filename": nome_xml, "content": xml_b64},
+                *(
+                    [{"filename": nome_dat, "content": base64.b64encode(dat.encode("utf-8")).decode("ascii")}]
+                    if nome_dat and dat else []
+                ),
+            ],
         }).encode()
         req = urllib.request.Request(
             "https://api.resend.com/emails",
@@ -175,7 +181,7 @@ def checkin():
     )
 
     # Notificação por email (silenciosa se não configurado)
-    enviar_email_checkin(boletim, ficheiros["nome_xml"], ficheiros["xml"])
+    enviar_email_checkin(boletim, ficheiros["nome_xml"], ficheiros["xml"], ficheiros["nome_dat"], ficheiros["dat"])
 
     return render_template(
         "sucesso.html",
