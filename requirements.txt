@@ -1,6 +1,9 @@
 # Interface web.
 Flask>=3.0
 
+# Geração de PDF para anexo no email.
+reportlab>=4.0
+
 # Driver Postgres — usado SÓ no modo cloud (quando existe POSTGRES_URL).
 # Localmente não é preciso: o storage importa-o de forma tardia e usa ficheiros.
 psycopg2-binary>=2.9

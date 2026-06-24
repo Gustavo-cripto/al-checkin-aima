@@ -47,6 +47,68 @@ APARTAMENTOS = {
 }
 
 
+def gerar_pdf_boletim(boletim) -> bytes:
+    """Gera um PDF legível com os dados do hóspede."""
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import cm
+    import io
+
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4, topMargin=2*cm, bottomMargin=2*cm,
+                            leftMargin=2*cm, rightMargin=2*cm)
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle('title', parent=styles['Heading1'], fontSize=16,
+                                 textColor=colors.HexColor('#1f7a8c'), spaceAfter=6)
+    sub_style = ParagraphStyle('sub', parent=styles['Normal'], fontSize=9,
+                               textColor=colors.grey, spaceAfter=12)
+
+    def fmt_data(d):
+        if d and len(d) == 8:
+            return f"{d[6:8]}/{d[4:6]}/{d[0:4]}"
+        return d or "—"
+
+    campos = [
+        ("Apelido", boletim.apelido),
+        ("Nome próprio", boletim.nome or "—"),
+        ("Data de nascimento", fmt_data(boletim.data_nascimento)),
+        ("Local de nascimento", boletim.local_nascimento or "—"),
+        ("Nacionalidade", boletim.nacionalidade),
+        ("Tipo de documento", boletim.tipo_documento),
+        ("Nº do documento", boletim.documento_identificacao),
+        ("País emissor", boletim.pais_emissor_documento),
+        ("País de residência", boletim.pais_residencia_origem),
+        ("Local de residência", boletim.local_residencia_origem or "—"),
+        ("Data de entrada", fmt_data(boletim.data_entrada)),
+        ("Data de saída", fmt_data(boletim.data_saida) if boletim.data_saida else "—"),
+    ]
+
+    table_data = [[Paragraph(f"<b>{k}</b>", styles['Normal']),
+                   Paragraph(str(v), styles['Normal'])] for k, v in campos]
+
+    table = Table(table_data, colWidths=[6*cm, 11*cm])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f0fafb')),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e2e8f0')),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('LEFTPADDING', (0, 0), (-1, -1), 8),
+    ]))
+
+    story = [
+        Paragraph("White Sand Apartments — Boletim de Check-in", title_style),
+        Paragraph(f"Preenchido em {fmt_data(boletim.data_entrada)} · Documento gerado automaticamente", sub_style),
+        table,
+        Spacer(1, 1*cm),
+        Paragraph("Dados comunicados à AIMA (SIBA) conforme lei portuguesa.", styles['Normal']),
+    ]
+    doc.build(story)
+    return buf.getvalue()
+
+
 def enviar_email_checkin(boletim: Boletim, nome_xml: str, xml: str, nome_dat: str = "", dat: str = "") -> None:
     """Envia email com XML em anexo via Resend. Silencioso em caso de erro."""
     import base64
@@ -79,12 +141,16 @@ def enviar_email_checkin(boletim: Boletim, nome_xml: str, xml: str, nome_dat: st
 </p>
 """
         xml_b64 = base64.b64encode(xml.encode("utf-8")).decode("ascii")
+        pdf_bytes = gerar_pdf_boletim(boletim)
+        pdf_b64 = base64.b64encode(pdf_bytes).decode("ascii")
+        nome_pdf = nome_xml.replace(".xml", ".pdf")
         payload = json.dumps({
             "from": "onboarding@resend.dev",
             "to": [NOTIFY_EMAIL],
             "subject": f"✅ Check-in: {boletim.apelido}, {boletim.nome} ({boletim.data_entrada})",
             "html": corpo,
             "attachments": [
+                {"filename": nome_pdf, "content": pdf_b64},
                 {"filename": nome_xml, "content": xml_b64},
                 *(
                     [{"filename": nome_dat, "content": base64.b64encode(dat.encode("utf-8")).decode("ascii")}]
