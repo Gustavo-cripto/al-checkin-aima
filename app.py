@@ -97,7 +97,8 @@ def enviar_email_checkin(boletim: Boletim, nome_xml: str, xml: str) -> None:
         urllib.request.urlopen(req, timeout=10)
         app.logger.info("Email enviado para %s (%s)", NOTIFY_EMAIL, nome_xml)
     except Exception as exc:
-        app.logger.warning("Email não enviado: %s", exc)
+        body = getattr(exc, 'read', lambda: b'')()
+        app.logger.warning("Email não enviado: %s | body: %s", exc, body)
 
 
 def carregar_config() -> dict:
