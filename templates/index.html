@@ -103,8 +103,8 @@
         <label><span data-i18n="data_entrada">Data de entrada (check-in)</span> <span class="req">*</span>
           <input type="date" name="data_entrada" required value="{{ v.data_entrada or '' }}">
         </label>
-        <label><span data-i18n="data_saida">Data de saída (check-out)</span>
-          <input type="date" name="data_saida" value="{{ v.data_saida or '' }}">
+        <label><span data-i18n="data_saida">Data de saída (check-out)</span> <span class="req">*</span>
+          <input type="date" name="data_saida" required value="{{ v.data_saida or '' }}">
         </label>
       </div>
 
