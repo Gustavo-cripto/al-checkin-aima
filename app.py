@@ -48,18 +48,11 @@ APARTAMENTOS = {
 
 
 def enviar_email_checkin(boletim: Boletim, nome_xml: str, xml: str) -> None:
-    """Envia email com XML em anexo via SMTP (Outlook). Silencioso em caso de erro."""
-    import smtplib
-    import ssl
-    from email.mime.multipart import MIMEMultipart
-    from email.mime.text import MIMEText
-    from email.mime.base import MIMEBase
-    from email import encoders
-
-    smtp_user = os.environ.get("SMTP_USER")
-    smtp_pass = os.environ.get("SMTP_PASS")
-    if not smtp_user or not smtp_pass:
-        app.logger.warning("SMTP_USER/SMTP_PASS não configurados — email não enviado")
+    """Envia email com XML em anexo via Resend. Silencioso em caso de erro."""
+    import base64
+    api_key = os.environ.get("RESEND_API_KEY")
+    if not api_key:
+        app.logger.warning("RESEND_API_KEY não configurado — email não enviado")
         return
     try:
         corpo = f"""
@@ -84,24 +77,23 @@ def enviar_email_checkin(boletim: Boletim, nome_xml: str, xml: str) -> None:
   Enviado automaticamente · White Sand Apartments AL Check-in
 </p>
 """
-        msg = MIMEMultipart()
-        msg["From"] = smtp_user
-        msg["To"] = NOTIFY_EMAIL
-        msg["Subject"] = f"Check-in: {boletim.apelido}, {boletim.nome} ({boletim.data_entrada})"
-        msg.attach(MIMEText(corpo, "html", "utf-8"))
-
-        part = MIMEBase("application", "xml")
-        part.set_payload(xml.encode("utf-8"))
-        encoders.encode_base64(part)
-        part.add_header("Content-Disposition", f'attachment; filename="{nome_xml}"')
-        msg.attach(part)
-
-        context = ssl.create_default_context()
-        with smtplib.SMTP("smtp-mail.outlook.com", 587, timeout=20) as server:
-            server.starttls(context=context)
-            server.login(smtp_user, smtp_pass)
-            server.sendmail(smtp_user, NOTIFY_EMAIL, msg.as_bytes())
-
+        xml_b64 = base64.b64encode(xml.encode("utf-8")).decode("ascii")
+        payload = json.dumps({
+            "from": "onboarding@resend.dev",
+            "to": [NOTIFY_EMAIL],
+            "subject": f"✅ Check-in: {boletim.apelido}, {boletim.nome} ({boletim.data_entrada})",
+            "html": corpo,
+            "attachments": [{"filename": nome_xml, "content": xml_b64}],
+        }).encode()
+        req = urllib.request.Request(
+            "https://api.resend.com/emails",
+            data=payload,
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+        )
+        urllib.request.urlopen(req, timeout=10)
         app.logger.info("Email enviado para %s (%s)", NOTIFY_EMAIL, nome_xml)
     except Exception as exc:
         app.logger.warning("Email não enviado: %s", exc)
