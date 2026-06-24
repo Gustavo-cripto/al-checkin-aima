@@ -92,6 +92,7 @@ def enviar_email_checkin(boletim: Boletim, nome_xml: str, xml: str) -> None:
             headers={
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json",
+                "User-Agent": "WhiteSandApartments/1.0",
             },
         )
         urllib.request.urlopen(req, timeout=10)
