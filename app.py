@@ -222,7 +222,18 @@ def checkin():
         unidade.chave_acesso = apto["chave_acesso"]
         unidade.nome = f"WHITE SAND APARTMENTS - {apto['nome'].upper()}"
 
-    boletim = Boletim.from_form(request.form.to_dict())
+    # Separar nome completo em apelido + nome para o XML AIMA
+    form_data = request.form.to_dict()
+    nome_completo = form_data.pop("nome_completo", "").strip().upper()
+    partes = nome_completo.split()
+    if len(partes) >= 2:
+        form_data["apelido"] = partes[-1]
+        form_data["nome"] = " ".join(partes[:-1])
+    else:
+        form_data["apelido"] = nome_completo
+        form_data["nome"] = ""
+
+    boletim = Boletim.from_form(form_data)
     erros = boletim.validate()
     if erros:
         return render_template(

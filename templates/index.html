@@ -36,14 +36,9 @@
     <form method="post" action="{{ url_for('checkin') }}" autocomplete="off">
       <input type="hidden" name="apartamento" value="{{ apt or v.apartamento or '' }}">
 
-      <div class="row two">
-        <label><span data-i18n="apelido">Apelido</span> <span class="req">*</span>
-          <input name="apelido" required value="{{ v.apelido or '' }}" placeholder="SILVA">
-        </label>
-        <label><span data-i18n="nome">Nome próprio</span> <span class="req">*</span>
-          <input name="nome" required value="{{ v.nome or '' }}" placeholder="MARIA JOÃO">
-        </label>
-      </div>
+      <label><span data-i18n="nome_completo">Nome completo</span> <span class="req">*</span>
+        <input name="nome_completo" required value="{{ ((v.nome or '') + ' ' + (v.apelido or '')).strip() or '' }}" placeholder="MARIA JOÃO SILVA" data-i18n-placeholder="nome_completo_ph">
+      </label>
 
       <div class="row two">
         <label><span data-i18n="data_nasc">Data de nascimento</span> <span class="req">*</span>
@@ -123,7 +118,7 @@ const T = {
   pt: {
     titulo: "Check-in", subtitulo: "Preencha os seus dados. Campos com", obrigatorios: "são obrigatórios.",
     apartamento: "Apartamento",
-    corrija: "Corrija os seguintes pontos:", apelido: "Apelido", nome: "Nome próprio",
+    corrija: "Corrija os seguintes pontos:", nome_completo: "Nome completo", nome_completo_ph: "MARIA JOÃO SILVA",
     data_nasc: "Data de nascimento", local_nasc: "Local de nascimento", nacionalidade: "Nacionalidade",
     tipo_doc: "Tipo de documento", num_doc: "Nº do documento", pais_emissor: "País emissor do documento",
     pais_residencia: "País de residência", local_residencia: "Local de residência",
@@ -135,7 +130,7 @@ const T = {
   en: {
     titulo: "Check-in", subtitulo: "Fill in your details. Fields with", obrigatorios: "are required.",
     apartamento: "Apartment",
-    corrija: "Please correct the following:", apelido: "Surname", nome: "First name",
+    corrija: "Please correct the following:", nome_completo: "Full name", nome_completo_ph: "MARIA JOÃO SILVA",
     data_nasc: "Date of birth", local_nasc: "Place of birth", nacionalidade: "Nationality",
     tipo_doc: "Document type", num_doc: "Document number", pais_emissor: "Document issuing country",
     pais_residencia: "Country of residence", local_residencia: "Place of residence",
@@ -147,7 +142,7 @@ const T = {
   es: {
     titulo: "Check-in", subtitulo: "Complete sus datos. Los campos con", obrigatorios: "son obligatorios.",
     apartamento: "Apartamento",
-    corrija: "Corrija los siguientes puntos:", apelido: "Apellido", nome: "Nombre",
+    corrija: "Corrija los siguientes puntos:", nome_completo: "Nombre completo", nome_completo_ph: "MARIA JOÃO SILVA",
     data_nasc: "Fecha de nacimiento", local_nasc: "Lugar de nacimiento", nacionalidade: "Nacionalidad",
     tipo_doc: "Tipo de documento", num_doc: "Nº de documento", pais_emissor: "País emisor del documento",
     pais_residencia: "País de residencia", local_residencia: "Lugar de residencia",
@@ -159,7 +154,7 @@ const T = {
   fr: {
     titulo: "Check-in", subtitulo: "Remplissez vos coordonnées. Les champs avec", obrigatorios: "sont obligatoires.",
     apartamento: "Appartement",
-    corrija: "Veuillez corriger les points suivants :", apelido: "Nom de famille", nome: "Prénom",
+    corrija: "Veuillez corriger les points suivants :", nome_completo: "Nom complet", nome_completo_ph: "MARIA JOÃO SILVA",
     data_nasc: "Date de naissance", local_nasc: "Lieu de naissance", nacionalidade: "Nationalité",
     tipo_doc: "Type de document", num_doc: "N° de document", pais_emissor: "Pays émetteur du document",
     pais_residencia: "Pays de résidence", local_residencia: "Lieu de résidence",
@@ -171,7 +166,7 @@ const T = {
   de: {
     titulo: "Check-in", subtitulo: "Bitte füllen Sie Ihre Daten aus. Felder mit", obrigatorios: "sind Pflichtfelder.",
     apartamento: "Apartment",
-    corrija: "Bitte korrigieren Sie folgende Punkte:", apelido: "Nachname", nome: "Vorname",
+    corrija: "Bitte korrigieren Sie folgende Punkte:", nome_completo: "Vollständiger Name", nome_completo_ph: "MARIA JOÃO SILVA",
     data_nasc: "Geburtsdatum", local_nasc: "Geburtsort", nacionalidade: "Staatsangehörigkeit",
     tipo_doc: "Dokumententyp", num_doc: "Dokumentennummer", pais_emissor: "Ausstellungsland des Dokuments",
     pais_residencia: "Wohnsitzland", local_residencia: "Wohnort",
