@@ -1,9 +1,15 @@
 """Geração do ficheiro .DAT (formato de UPLOAD por ficheiro do SIBA).
 
-Formato de registos separados por '|':
-  - Registo tipo 0 (cabeçalho): dados da unidade hoteleira
-  - Registo tipo 1 (hóspede): um por boletim
-  - Registo tipo 9 (sumário): contagem total de registos
+Especificação oficial (SIBA -> Ajuda -> Modos de Envio -> Upload de Ficheiros):
+  - O ficheiro tem 3 tipos de registo:
+      Tipo 0  -> Registo de Cabeçalho (dados da Unidade Hoteleira)
+      Tipo 1  -> Registo de Boletim   (um por hóspede)
+      Tipo 9  -> Registo de Resumo    (fecho: total de registos, data, nº série)
+  - REGRA-CHAVE: "Os campos terminam todos com um caracter | (pipe)". O pipe é
+    TERMINADOR (não separador): cada campo, INCLUINDO o último, é seguido de '|'.
+    Ex.: um registo de fecho válido é  9|3|20260714|1|
+    (Faltar o '|' final faz o portal contar menos campos e rejeitar com
+     "Registo de fecho de ficheiro com número de campos inválido".)
 
 Nome do ficheiro: <NIF><Estabelecimento><NumeroFicheiro>.DAT
 
@@ -21,8 +27,13 @@ TIPO_FICHEIRO = "BA03"
 
 
 def _campo(valor: str) -> str:
-    """Remove o separador '|' de um valor para não corromper o registo."""
+    """Remove o terminador '|' de um valor para não corromper o registo."""
     return (str(valor) if valor is not None else "").replace("|", " ")
+
+
+def _registo(campos: list) -> str:
+    """Constrói um registo em que CADA campo termina com '|' (incl. o último)."""
+    return "".join(f"{_campo(c)}|" for c in campos)
 
 
 def construir_dat(
@@ -36,8 +47,8 @@ def construir_dat(
 
     linhas: list[str] = []
 
-    # Registo 0 — cabeçalho
-    linhas.append("|".join(_campo(c) for c in [
+    # Registo 0 — cabeçalho (13 campos)
+    linhas.append(_registo([
         "0",
         TIPO_FICHEIRO,
         unidade.codigo,
@@ -53,9 +64,9 @@ def construir_dat(
         unidade.email_contacto[:140],
     ]))
 
-    # Registos 1 — hóspedes
+    # Registos 1 — hóspedes (13 campos cada)
     for b in boletins:
-        linhas.append("|".join(_campo(c) for c in [
+        linhas.append(_registo([
             "1",
             b.apelido[:40],
             b.nome[:40],
@@ -71,11 +82,15 @@ def construir_dat(
             b.data_saida,
         ]))
 
-    # Registo 9 — fecho: apenas "9|<nº total de registos>" (inclui o próprio
-    # registo 9). O portal SIBA rejeita o fecho com mais campos do que este
-    # ("Registo de fecho de ficheiro com número de campos inválido").
+    # Registo 9 — resumo/fecho (4 campos): tipo, nº total de registos (inclui
+    # este), data de geração (AAAAMMDD) e nº de série do ficheiro.
     numero_registos = len(linhas) + 1
-    linhas.append(f"9|{numero_registos}")
+    linhas.append(_registo([
+        "9",
+        str(numero_registos),
+        data_movimento,
+        str(numero_ficheiro),
+    ]))
 
     return "\r\n".join(linhas) + "\r\n"
 
