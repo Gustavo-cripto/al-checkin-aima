@@ -71,14 +71,11 @@ def construir_dat(
             b.data_saida,
         ]))
 
-    # Registo 9 — sumário (nº total de registos inclui o próprio registo 9)
+    # Registo 9 — fecho: apenas "9|<nº total de registos>" (inclui o próprio
+    # registo 9). O portal SIBA rejeita o fecho com mais campos do que este
+    # ("Registo de fecho de ficheiro com número de campos inválido").
     numero_registos = len(linhas) + 1
-    linhas.append("|".join(_campo(c) for c in [
-        "9",
-        str(numero_registos),
-        data_movimento,
-        str(numero_ficheiro),
-    ]))
+    linhas.append(f"9|{numero_registos}")
 
     return "\r\n".join(linhas) + "\r\n"
 
