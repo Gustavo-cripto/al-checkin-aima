@@ -191,3 +191,40 @@ button:hover, .btn:hover { background: var(--brand-dark); }
   font-size: .82rem; white-space: pre-wrap; word-break: break-word; overflow-x: auto;
 }
 code { background: #eef2f5; padding: 1px 5px; border-radius: 4px; font-size: .85em; }
+
+/* ---- Multi-hóspede ---- */
+fieldset.estadia, fieldset.hospede {
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  padding: 16px 16px 4px;
+  margin: 0 0 16px;
+  background: rgba(255,255,255,0.5);
+}
+fieldset.hospede legend, fieldset.estadia legend {
+  font-weight: 700;
+  font-size: .95rem;
+  color: var(--brand-dark);
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+fieldset.hospede .hnum {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height: 22px; padding: 0 6px;
+  background: var(--brand); color: #fff; border-radius: 11px; font-size: .8rem;
+}
+.rm-hospede {
+  width: auto; margin: 0; padding: 4px 10px;
+  font-size: .75rem; font-weight: 600;
+  background: #fdecea; color: var(--err);
+  border: 1px solid #f5c6cb; border-radius: 8px;
+}
+.rm-hospede:hover { background: #f8d7da; }
+.add-btn {
+  background: #fff; color: var(--brand-dark);
+  border: 2px dashed var(--brand); margin-bottom: 6px;
+}
+.add-btn:hover { background: #f0fafb; }
+.rem-count { font-weight: 600; opacity: .8; }
+.submit-btn { margin-top: 10px; }

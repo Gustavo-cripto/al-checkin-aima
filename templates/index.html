@@ -18,6 +18,67 @@
     </div>
   </header>
 
+{# ---- Macro: campos pessoais de um hóspede (g = valores, req = obrigatório) ---- #}
+{% macro campos_hospede(g, req) %}
+  <label><span data-i18n="nome_completo">Nome completo</span> <span class="req">*</span>
+    <input name="nome_completo" {{ 'required' if req else '' }} value="{{ g.get('nome_completo','') }}" placeholder="MARIA JOÃO SILVA" data-i18n-placeholder="nome_completo_ph">
+  </label>
+
+  <div class="row two">
+    <label><span data-i18n="data_nasc">Data de nascimento</span> <span class="req">*</span>
+      <input type="date" name="data_nascimento" {{ 'required' if req else '' }} value="{{ g.get('data_nascimento','') }}">
+    </label>
+    <label><span data-i18n="local_nasc">Local de nascimento</span>
+      <input name="local_nascimento" value="{{ g.get('local_nascimento','') }}" data-i18n-placeholder="cidade" placeholder="Cidade">
+    </label>
+  </div>
+
+  <label><span data-i18n="nacionalidade">Nacionalidade</span> <span class="req">*</span>
+    <select name="nacionalidade" {{ 'required' if req else '' }}>
+      <option value="" data-i18n="selecione">— selecione —</option>
+      {% for cod, nome in paises %}
+      <option value="{{ cod }}" {{ 'selected' if g.get('nacionalidade')==cod else '' }}>{{ nome }} ({{ cod }})</option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <div class="row two">
+    <label><span data-i18n="tipo_doc">Tipo de documento</span> <span class="req">*</span>
+      <select name="tipo_documento" {{ 'required' if req else '' }}>
+        <option value="" data-i18n="selecione">— selecione —</option>
+        {% for cod, nome in tipos_doc.items() %}
+        <option value="{{ cod }}" {{ 'selected' if g.get('tipo_documento')==cod else '' }}>{{ nome }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label><span data-i18n="num_doc">Nº do documento</span> <span class="req">*</span>
+      <input name="documento_identificacao" {{ 'required' if req else '' }} value="{{ g.get('documento_identificacao','') }}" placeholder="Ex.: AB123456">
+    </label>
+  </div>
+
+  <label><span data-i18n="pais_emissor">País emissor do documento</span> <span class="req">*</span>
+    <select name="pais_emissor_documento" {{ 'required' if req else '' }}>
+      <option value="" data-i18n="selecione">— selecione —</option>
+      {% for cod, nome in paises %}
+      <option value="{{ cod }}" {{ 'selected' if g.get('pais_emissor_documento')==cod else '' }}>{{ nome }} ({{ cod }})</option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <label><span data-i18n="pais_residencia">País de residência</span> <span class="req">*</span>
+    <select name="pais_residencia_origem" {{ 'required' if req else '' }}>
+      <option value="" data-i18n="selecione">— selecione —</option>
+      {% for cod, nome in paises %}
+      <option value="{{ cod }}" {{ 'selected' if g.get('pais_residencia_origem')==cod else '' }}>{{ nome }} ({{ cod }})</option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <label><span data-i18n="local_residencia">Local de residência</span>
+    <input name="local_residencia_origem" value="{{ g.get('local_residencia_origem','') }}" data-i18n-placeholder="cidade" placeholder="Cidade">
+  </label>
+{% endmacro %}
+
   <main class="card">
     <h1 data-i18n="titulo">Check-in</h1>
     <p class="sub"><span data-i18n="subtitulo">Preencha os seus dados. Campos com</span> <span class="req">*</span> <span data-i18n="obrigatorios">são obrigatórios.</span></p>
@@ -29,84 +90,55 @@
     </div>
     {% endif %}
 
-    {% set v = valores or {} %}
+    {% set d = datas or {} %}
     {% if apt_nome %}
     <p class="apt-badge">🏠 {{ apt_nome }}</p>
     {% endif %}
+
     <form method="post" action="{{ url_for('checkin') }}" autocomplete="off">
-      <input type="hidden" name="apartamento" value="{{ apt or v.apartamento or '' }}">
+      <input type="hidden" name="apartamento" value="{{ apt or '' }}">
 
-      <label><span data-i18n="nome_completo">Nome completo</span> <span class="req">*</span>
-        <input name="nome_completo" required value="{{ ((v.nome or '') + ' ' + (v.apelido or '')).strip() or '' }}" placeholder="MARIA JOÃO SILVA" data-i18n-placeholder="nome_completo_ph">
-      </label>
+      <fieldset class="estadia">
+        <legend data-i18n="datas_estadia">Datas da estadia</legend>
+        <div class="row two">
+          <label><span data-i18n="data_entrada">Data de entrada (check-in)</span> <span class="req">*</span>
+            <input type="date" name="data_entrada" required value="{{ d.get('data_entrada','') }}">
+          </label>
+          <label><span data-i18n="data_saida">Data de saída (check-out)</span> <span class="req">*</span>
+            <input type="date" name="data_saida" required value="{{ d.get('data_saida','') }}">
+          </label>
+        </div>
+      </fieldset>
 
-      <div class="row two">
-        <label><span data-i18n="data_nasc">Data de nascimento</span> <span class="req">*</span>
-          <input type="date" name="data_nascimento" required value="{{ v.data_nascimento or '' }}">
-        </label>
-        <label><span data-i18n="local_nasc">Local de nascimento</span>
-          <input name="local_nascimento" value="{{ v.local_nascimento or '' }}" data-i18n-placeholder="cidade" placeholder="Cidade">
-        </label>
+      <div id="hospedes">
+        {% for g in hospedes %}
+        <fieldset class="hospede">
+          <legend><span data-i18n="hospede">Hóspede</span> <span class="hnum">{{ loop.index }}</span>
+            <button type="button" class="rm-hospede" data-i18n="remover">Remover</button>
+          </legend>
+          {{ campos_hospede(g, loop.first) }}
+        </fieldset>
+        {% endfor %}
       </div>
 
-      <label><span data-i18n="nacionalidade">Nacionalidade</span> <span class="req">*</span>
-        <select name="nacionalidade" required>
-          <option value="" data-i18n="selecione">— selecione —</option>
-          {% for cod, nome in paises %}
-          <option value="{{ cod }}" {{ 'selected' if v.nacionalidade==cod else '' }}>{{ nome }} ({{ cod }})</option>
-          {% endfor %}
-        </select>
-      </label>
+      {% if max_hospedes > 1 %}
+      <button type="button" id="add-hospede" class="add-btn">＋ <span data-i18n="add_hospede">Adicionar outro hóspede</span><span class="rem-count"></span></button>
+      {% endif %}
 
-      <div class="row two">
-        <label><span data-i18n="tipo_doc">Tipo de documento</span> <span class="req">*</span>
-          <select name="tipo_documento" required>
-            <option value="" data-i18n="selecione">— selecione —</option>
-            {% for cod, nome in tipos_doc.items() %}
-            <option value="{{ cod }}" {{ 'selected' if v.tipo_documento==cod else '' }}>{{ nome }}</option>
-            {% endfor %}
-          </select>
-        </label>
-        <label><span data-i18n="num_doc">Nº do documento</span> <span class="req">*</span>
-          <input name="documento_identificacao" required value="{{ v.documento_identificacao or '' }}" placeholder="Ex.: AB123456">
-        </label>
-      </div>
-
-      <label><span data-i18n="pais_emissor">País emissor do documento</span> <span class="req">*</span>
-        <select name="pais_emissor_documento" required>
-          <option value="" data-i18n="selecione">— selecione —</option>
-          {% for cod, nome in paises %}
-          <option value="{{ cod }}" {{ 'selected' if v.pais_emissor_documento==cod else '' }}>{{ nome }} ({{ cod }})</option>
-          {% endfor %}
-        </select>
-      </label>
-
-      <label><span data-i18n="pais_residencia">País de residência</span> <span class="req">*</span>
-        <select name="pais_residencia_origem" required>
-          <option value="" data-i18n="selecione">— selecione —</option>
-          {% for cod, nome in paises %}
-          <option value="{{ cod }}" {{ 'selected' if v.pais_residencia_origem==cod else '' }}>{{ nome }} ({{ cod }})</option>
-          {% endfor %}
-        </select>
-      </label>
-
-      <label><span data-i18n="local_residencia">Local de residência</span>
-        <input name="local_residencia_origem" value="{{ v.local_residencia_origem or '' }}" data-i18n-placeholder="cidade" placeholder="Cidade">
-      </label>
-
-      <div class="row two">
-        <label><span data-i18n="data_entrada">Data de entrada (check-in)</span> <span class="req">*</span>
-          <input type="date" name="data_entrada" required value="{{ v.data_entrada or '' }}">
-        </label>
-        <label><span data-i18n="data_saida">Data de saída (check-out)</span> <span class="req">*</span>
-          <input type="date" name="data_saida" required value="{{ v.data_saida or '' }}">
-        </label>
-      </div>
-
-      <button type="submit" data-i18n="btn_submit">Concluir check-in</button>
+      <button type="submit" class="submit-btn" data-i18n="btn_submit">Concluir check-in</button>
       <p class="nota" data-i18n="nota">Os dados são usados apenas para a comunicação obrigatória de alojamento à AIMA (SIBA), conforme a lei portuguesa, e para garantir a segurança, caso seja necessário, junto das entidades competentes.</p>
     </form>
   </main>
+
+  {# Modelo (inerte) usado pelo JS para clonar novos hóspedes #}
+  <template id="tpl-hospede">
+    <fieldset class="hospede">
+      <legend><span data-i18n="hospede">Hóspede</span> <span class="hnum"></span>
+        <button type="button" class="rm-hospede" data-i18n="remover">Remover</button>
+      </legend>
+      {{ campos_hospede({}, false) }}
+    </fieldset>
+  </template>
 
   <footer class="site-footer">
     <p class="footer-title" data-i18n="contactos">Contactos do Anfitrião</p>
@@ -114,10 +146,14 @@
   </footer>
 
 <script>
+const MAX_HOSPEDES = {{ max_hospedes }};
+let currentLang = localStorage.getItem('lang') || 'pt';
+
 const T = {
   pt: {
     titulo: "Check-in", subtitulo: "Preencha os seus dados. Campos com", obrigatorios: "são obrigatórios.",
-    apartamento: "Apartamento",
+    apartamento: "Apartamento", datas_estadia: "Datas da estadia",
+    hospede: "Hóspede", add_hospede: "Adicionar outro hóspede", remover: "Remover",
     corrija: "Corrija os seguintes pontos:", nome_completo: "Nome completo", nome_completo_ph: "MARIA JOÃO SILVA",
     data_nasc: "Data de nascimento", local_nasc: "Local de nascimento", nacionalidade: "Nacionalidade",
     tipo_doc: "Tipo de documento", num_doc: "Nº do documento", pais_emissor: "País emissor do documento",
@@ -129,7 +165,8 @@ const T = {
   },
   en: {
     titulo: "Check-in", subtitulo: "Fill in your details. Fields with", obrigatorios: "are required.",
-    apartamento: "Apartment",
+    apartamento: "Apartment", datas_estadia: "Stay dates",
+    hospede: "Guest", add_hospede: "Add another guest", remover: "Remove",
     corrija: "Please correct the following:", nome_completo: "Full name", nome_completo_ph: "MARIA JOÃO SILVA",
     data_nasc: "Date of birth", local_nasc: "Place of birth", nacionalidade: "Nationality",
     tipo_doc: "Document type", num_doc: "Document number", pais_emissor: "Document issuing country",
@@ -141,7 +178,8 @@ const T = {
   },
   es: {
     titulo: "Check-in", subtitulo: "Complete sus datos. Los campos con", obrigatorios: "son obligatorios.",
-    apartamento: "Apartamento",
+    apartamento: "Apartamento", datas_estadia: "Fechas de estancia",
+    hospede: "Huésped", add_hospede: "Añadir otro huésped", remover: "Quitar",
     corrija: "Corrija los siguientes puntos:", nome_completo: "Nombre completo", nome_completo_ph: "MARIA JOÃO SILVA",
     data_nasc: "Fecha de nacimiento", local_nasc: "Lugar de nacimiento", nacionalidade: "Nacionalidad",
     tipo_doc: "Tipo de documento", num_doc: "Nº de documento", pais_emissor: "País emisor del documento",
@@ -153,7 +191,8 @@ const T = {
   },
   fr: {
     titulo: "Check-in", subtitulo: "Remplissez vos coordonnées. Les champs avec", obrigatorios: "sont obligatoires.",
-    apartamento: "Appartement",
+    apartamento: "Appartement", datas_estadia: "Dates du séjour",
+    hospede: "Client", add_hospede: "Ajouter un autre client", remover: "Retirer",
     corrija: "Veuillez corriger les points suivants :", nome_completo: "Nom complet", nome_completo_ph: "MARIA JOÃO SILVA",
     data_nasc: "Date de naissance", local_nasc: "Lieu de naissance", nacionalidade: "Nationalité",
     tipo_doc: "Type de document", num_doc: "N° de document", pais_emissor: "Pays émetteur du document",
@@ -165,7 +204,8 @@ const T = {
   },
   de: {
     titulo: "Check-in", subtitulo: "Bitte füllen Sie Ihre Daten aus. Felder mit", obrigatorios: "sind Pflichtfelder.",
-    apartamento: "Apartment",
+    apartamento: "Apartment", datas_estadia: "Aufenthaltsdaten",
+    hospede: "Gast", add_hospede: "Weiteren Gast hinzufügen", remover: "Entfernen",
     corrija: "Bitte korrigieren Sie folgende Punkte:", nome_completo: "Vollständiger Name", nome_completo_ph: "MARIA JOÃO SILVA",
     data_nasc: "Geburtsdatum", local_nasc: "Geburtsort", nacionalidade: "Staatsangehörigkeit",
     tipo_doc: "Dokumententyp", num_doc: "Dokumentennummer", pais_emissor: "Ausstellungsland des Dokuments",
@@ -177,8 +217,8 @@ const T = {
   },
 };
 
-function setLang(lang) {
-  const t = T[lang];
+function applyLang(lang) {
+  const t = T[lang]; if (!t) return;
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     if (t[key]) el.textContent = t[key];
@@ -188,14 +228,61 @@ function setLang(lang) {
     if (t[key]) el.placeholder = t[key];
   });
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+  const btn = document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`);
+  if (btn) btn.classList.add('active');
   document.documentElement.lang = lang;
-  localStorage.setItem('lang', lang);
 }
 
-// Restaurar língua guardada
-const saved = localStorage.getItem('lang');
-if (saved && T[saved]) setLang(saved);
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('lang', lang);
+  applyLang(lang);
+}
+
+function contarHospedes() {
+  return document.querySelectorAll('#hospedes .hospede').length;
+}
+
+function atualizarBotaoAdd() {
+  const btn = document.getElementById('add-hospede');
+  if (!btn) return;
+  const restantes = MAX_HOSPEDES - contarHospedes();
+  btn.style.display = restantes <= 0 ? 'none' : '';
+  const rc = btn.querySelector('.rem-count');
+  if (rc) rc.textContent = restantes > 0 ? ` (${restantes})` : '';
+}
+
+function renumerar() {
+  document.querySelectorAll('#hospedes .hospede').forEach((fs, idx) => {
+    const hnum = fs.querySelector('.hnum');
+    if (hnum) hnum.textContent = idx + 1;
+    const rm = fs.querySelector('.rm-hospede');
+    if (rm) rm.style.display = idx === 0 ? 'none' : '';
+  });
+  atualizarBotaoAdd();
+}
+
+function ligarRemover(fs) {
+  const rm = fs.querySelector('.rm-hospede');
+  if (rm) rm.addEventListener('click', () => { fs.remove(); renumerar(); });
+}
+
+function adicionarHospede() {
+  if (contarHospedes() >= MAX_HOSPEDES) return;
+  const tpl = document.getElementById('tpl-hospede');
+  const node = tpl.content.firstElementChild.cloneNode(true);
+  document.getElementById('hospedes').appendChild(node);
+  ligarRemover(node);
+  renumerar();
+  applyLang(currentLang);
+  node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+document.querySelectorAll('#hospedes .hospede').forEach(ligarRemover);
+const addBtn = document.getElementById('add-hospede');
+if (addBtn) addBtn.addEventListener('click', adicionarHospede);
+renumerar();
+if (T[currentLang]) applyLang(currentLang);
 </script>
 </body>
 </html>

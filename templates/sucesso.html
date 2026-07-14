@@ -14,7 +14,11 @@
     <div class="ok-badge">✓</div>
     <h1 class="sucesso-titulo">Check-in concluído!</h1>
     <p class="sucesso-nome">Bem-vindo(a), <strong>{{ boletim.nome }} {{ boletim.apelido }}</strong></p>
+    {% if n_hospedes and n_hospedes > 1 %}
+    <p class="sub">Registámos <strong>{{ n_hospedes }} hóspedes</strong> nesta reserva.</p>
+    {% else %}
     <p class="sub">O seu registo foi submetido com sucesso.</p>
+    {% endif %}
 
     <div class="resumo sucesso-resumo">
       <div>
