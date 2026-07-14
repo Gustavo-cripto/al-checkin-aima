@@ -136,6 +136,10 @@ def enviar_email_checkin(boletim: Boletim, nome_xml: str, xml: str, nome_dat: st
   <tr><td style="padding:5px 16px 5px 0;color:#666">Ficheiro XML</td>
       <td style="padding:5px 0">{nome_xml}</td></tr>
 </table>
+<div style="font-family:sans-serif;margin-top:16px;padding:12px 16px;background:#eaf7f9;border-left:4px solid #1f7a8c;border-radius:4px">
+  📎 <b>Ficheiro para o portal AIMA:</b> {nome_dat or '—'}<br>
+  <span style="color:#555;font-size:13px">Carregar em siba.ssi.gov.pt &rarr; &Aacute;rea Reservada &rarr; Entrega de Boletins &rarr; Carregamento de Ficheiros</span>
+</div>
 <p style="font-family:sans-serif;color:#aaa;font-size:11px;margin-top:24px">
   Enviado automaticamente · White Sand Apartments AL Check-in
 </p>
