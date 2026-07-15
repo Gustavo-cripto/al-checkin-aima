@@ -17,6 +17,8 @@ from dataclasses import dataclass, field, asdict
 from datetime import date, datetime
 from typing import Optional
 
+from .countries import valido as pais_valido
+
 
 # Tipos de documento aceites pelo SIBA
 TIPO_DOC = {
@@ -163,12 +165,12 @@ class Boletim:
         if len(self.nome) > 40:
             erros.append("Nome excede 40 caracteres.")
 
-        if len(self.nacionalidade) != 3 or not self.nacionalidade.isalpha():
-            erros.append("Nacionalidade tem de ser um código de 3 letras.")
-        if len(self.pais_emissor_documento) != 3:
-            erros.append("País emissor do documento tem de ter 3 letras.")
-        if len(self.pais_residencia_origem) != 3:
-            erros.append("País de residência tem de ter 3 letras.")
+        if not pais_valido(self.nacionalidade):
+            erros.append("Nacionalidade inválida (código não reconhecido pelo SIBA).")
+        if not pais_valido(self.pais_emissor_documento):
+            erros.append("País emissor do documento inválido (código não reconhecido pelo SIBA).")
+        if not pais_valido(self.pais_residencia_origem):
+            erros.append("País de residência inválido (código não reconhecido pelo SIBA).")
 
         if not re.fullmatch(r"\d{8}", self.data_nascimento or ""):
             erros.append("Data de nascimento inválida (YYYYMMDD).")
